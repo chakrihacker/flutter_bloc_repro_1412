@@ -5,14 +5,16 @@ abstract class UserDataSourceEvent extends Equatable {
 }
 
 class LinkUserDataSourceEvent extends UserDataSourceEvent {
+  final String accountType;
   final String linkUserDataSourceDTO;
 
   LinkUserDataSourceEvent({
+    @required this.accountType,
     @required this.linkUserDataSourceDTO,
   });
 
   @override
-  List<Object> get props => [linkUserDataSourceDTO];
+  List<Object> get props => [accountType, linkUserDataSourceDTO];
 }
 
 class GetUserDataSourcesEvent extends UserDataSourceEvent {

@@ -18,10 +18,7 @@ class UserDataSourceBloc
     if (event is LinkUserDataSourceEvent) {
       try {
         yield LinkUserDataSourceLoading();
-
-        final dataSource = "Gmail";
-
-        yield LinkUserDataSourceLoaded(userDataSource: dataSource);
+        yield LinkUserDataSourceLoaded(userDataSource: event.accountType);
       } on Error {
         yield LinkUserDataSourceError(message: "Account Linking Failed");
       }

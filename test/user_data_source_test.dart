@@ -9,28 +9,22 @@ import 'package:mockito/mockito.dart';
 
 void main() {
   group("UserDataSource Screen", () {
-    MockUserDataSourceBloc mockUserDataSourceBloc;
+    UserDataSourceBloc mockUserDataSourceBloc;
 
     setUp(() {
       mockUserDataSourceBloc = MockUserDataSourceBloc();
-    });
-
-    tearDown(() {
-      mockUserDataSourceBloc.close();
     });
 
     Future<void> _buildApp(WidgetTester tester) async {
       await tester.pumpWidget(MaterialApp(
         title: "Test App",
         home: Scaffold(
-          body: BlocProvider<UserDataSourceBloc>(
-            create: (_) => mockUserDataSourceBloc,
+          body: BlocProvider.value(
+            value: mockUserDataSourceBloc,
             child: UserDataSourceView(),
           ),
         ),
       ));
-
-      await tester.pump(const Duration(minutes: 1));
     }
 
     testWidgets("Should render initial state", (WidgetTester tester) async {
@@ -53,16 +47,8 @@ void main() {
 
       await _buildApp(tester);
 
-      expect(find.text("Gmail"), findsOneWidget);
-
-      await tester.tap(find.text(("Gmail")));
-
       await tester.pump();
-      verify(
-        mockUserDataSourceBloc.add(
-          LinkUserDataSourceEvent(linkUserDataSourceDTO: account),
-        ),
-      ).called(1);
+
       expect(find.text("Account Linked Successfully"), findsOneWidget);
     });
   });
