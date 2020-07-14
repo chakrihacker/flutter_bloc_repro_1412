@@ -8,7 +8,6 @@ class UserDataSourceView extends StatefulWidget {
 }
 
 class _UserDataSourceViewState extends State<UserDataSourceView> {
-  int selectedDataSourceIdx = -1;
   List accounts = ["Gmail", "Facebook", "Twitter"];
 
   @override
@@ -18,17 +17,16 @@ class _UserDataSourceViewState extends State<UserDataSourceView> {
   }
 
   void handleGetUserDataSources({@required BuildContext context}) async {
-    final userDataSourceBloc = BlocProvider.of<UserDataSourceBloc>(context);
-    userDataSourceBloc.add(GetUserDataSourcesEvent());
+    context.bloc<UserDataSourceBloc>().add(GetUserDataSourcesEvent());
   }
 
   void handleAccountLinkPressed(int index) {
-    setState(() {
-      selectedDataSourceIdx = index;
-    });
-    final userDataSourceBloc = BlocProvider.of<UserDataSourceBloc>(context);
-    userDataSourceBloc
-        .add(LinkUserDataSourceEvent(linkUserDataSourceDTO: "test@gmail.com"));
+    context.bloc<UserDataSourceBloc>().add(
+          LinkUserDataSourceEvent(
+            accountType: accounts[index],
+            linkUserDataSourceDTO: "test@gmail.com",
+          ),
+        );
   }
 
   @override
@@ -36,18 +34,11 @@ class _UserDataSourceViewState extends State<UserDataSourceView> {
     return BlocListener<UserDataSourceBloc, UserDataSourceState>(
       listener: (blocContext, state) {
         if (state is LinkUserDataSourceLoaded) {
-          if (selectedDataSourceIdx != -1) {
-            setState(() {
-              accounts[selectedDataSourceIdx] =
-                  "${accounts[selectedDataSourceIdx]} - Linked";
-              selectedDataSourceIdx = -1;
-            });
-            Scaffold.of(blocContext).showSnackBar(
-              SnackBar(
-                content: Text("Account Linked Successfully"),
-              ),
-            );
-          }
+          Scaffold.of(blocContext).showSnackBar(
+            SnackBar(
+              content: Text("Account Linked Successfully"),
+            ),
+          );
         }
       },
       child: BlocBuilder<UserDataSourceBloc, UserDataSourceState>(
@@ -65,12 +56,8 @@ class _UserDataSourceViewState extends State<UserDataSourceView> {
                       height: 30,
                       alignment: Alignment.center,
                       child: FlatButton(
-                        onPressed: () {
-                          handleAccountLinkPressed(index);
-                        },
-                        child: Text(
-                          '${accounts[index]}',
-                        ),
+                        onPressed: () => handleAccountLinkPressed(index),
+                        child: Text('${accounts[index]}'),
                       ),
                     );
                   },
